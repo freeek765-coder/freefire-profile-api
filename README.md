@@ -1,35 +1,46 @@
-# 🔥 Free Fire Advanced Profile & Utility API
+# 🎯 Free Fire Profile & Utility API
 
-एक पावरफुल और मॉडर्न Flask API जिसे Vercel पर डिप्लॉय किया गया है। यह API Free Fire प्रोफाइल्स को मैनेज करने, गैलरी आइटम्स अपडेट करने, और लाइक्स भेजने जैसे फीचर्स प्रदान करती है।
+> A blazing-fast Flask backend for fetching Free Fire player profiles, managing gallery items, and sending profile likes — ready for serverless deployment on Vercel.
+
+![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.2.2-green?logo=flask)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
+
+---
+
+## 📖 Table of Contents
+
+- [✨ Features](#-features)
+- [🚀 Quick Start](#-quick-start)
+- [🔧 Installation](#-installation)
+- [🌐 API Endpoints](#-api-endpoints)
+- [📦 Deployment on Vercel](#-deployment-on-vercel)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📄 License](#-license)
 
 ---
 
-## 🚀 Endpoints & Usage Guide
+## ✨ Features
 
-### 1. Health Check
-* **URL:** `/health`
-* **Method:** `GET`
-* **Description:** चेक करता है कि सर्वर लाइव है या नहीं।
-
-### 2. Supported Regions
-* **URL:** `/regions`
-* **Method:** `GET`
-* **Description:** गेम के सभी एक्टिव रीजन्स की लिस्ट दिखाता है।
-
-### 3. Get Real Profile Details
-* **URL:** `/profile?uid=YOUR_UID&region=IND`
-* **Method:** `GET`
-* **Description:** यूज़र का असली नाम, लेवल, और अकाउंट डिटेल्स JSON फॉर्मेट में देता है।
-
-### 4. Add Gallery Items (Batch Supported)
-* **URL:** `/add?jwt=YOUR_JWT_TOKEN&item_id=101,102`
-* **Method:** `GET`
-* **Description:** एक साथ कई आइटम्स को प्रोफाइल गैलरी में जोड़ता है।
-
-### 5. Send Profile Likes
-* **URL:** `/like?uid=YOUR_UID&region=IND`
-* **Method:** `GET`
-* **Description:** टारगेट UID पर डायरेक्ट लाइक्स भेजता है।
+- ✅ **Health Check** – `/health` endpoint for monitoring.
+- 🌍 **Supported Regions** – Get list of all available game regions (`IND`, `BR`, `SG`, etc.).
+- 👤 **Player Profile** – Fetch accurate UID, nickname, level, season, and likes.
+- 🖼️ **Batch Gallery Updater** – Add multiple items using JWT authentication (`/add`).
+- ❤️ **Profile Likes** – Send likes to a target UID with before/after counts and daily limit tracking.
+- ⚡ **Optimized for Vercel** – Lightweight, scalable, and production-ready.
+- 🧹 **Clean Error Handling** – JSON responses with proper HTTP status codes.
 
 ---
-*Developed for high-speed automation and profile management.*
+
+## 🚀 Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/freefire-profile-api.git
+cd freefire-profile-api
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run locally
+python app.py
