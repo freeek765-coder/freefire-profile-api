@@ -1,5 +1,3 @@
-flask
-flask-cors
-pycryptodome
-requests
-protobuf
+Flask==3.0.2
+requests==2.31.0
+werkzeug==3.0.1

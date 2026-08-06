@@ -1,43 +1,35 @@
-# 🚀 Free Fire Profile API
+# 🔥 Free Fire Advanced Profile & Utility API
 
-## 📋 Project Overview
-A robust Python-based API designed for Free Fire profile management. This project enables seamless interaction with game services, allowing for profile customization and item updates via a clean API interface.
-
----
-
-## 🛠️ Tech Stack
-* **Language:** Python
-* **Framework:** Flask
-* **Deployment:** Vercel
-* **Dependencies:** `flask`, `flask-cors`, `pycryptodome`, `requests`, `protobuf`
+एक पावरफुल और मॉडर्न Flask API जिसे Vercel पर डिप्लॉय किया गया है। यह API Free Fire प्रोफाइल्स को मैनेज करने, गैलरी आइटम्स अपडेट करने, और लाइक्स भेजने जैसे फीचर्स प्रदान करती है।
 
 ---
 
-## ⚙️ Features
-- **Region Management:** Supports multiple global regions.
-- **Profile Updates:** Securely add items to the profile.
-- **Status Monitoring:** Real-time health check endpoint.
-- **Security:** AES-CBC encryption for secure data transmission.
+## 🚀 Endpoints & Usage Guide
+
+### 1. Health Check
+* **URL:** `/health`
+* **Method:** `GET`
+* **Description:** चेक करता है कि सर्वर लाइव है या नहीं।
+
+### 2. Supported Regions
+* **URL:** `/regions`
+* **Method:** `GET`
+* **Description:** गेम के सभी एक्टिव रीजन्स की लिस्ट दिखाता है।
+
+### 3. Get Real Profile Details
+* **URL:** `/profile?uid=YOUR_UID&region=IND`
+* **Method:** `GET`
+* **Description:** यूज़र का असली नाम, लेवल, और अकाउंट डिटेल्स JSON फॉर्मेट में देता है।
+
+### 4. Add Gallery Items (Batch Supported)
+* **URL:** `/add?jwt=YOUR_JWT_TOKEN&item_id=101,102`
+* **Method:** `GET`
+* **Description:** एक साथ कई आइटम्स को प्रोफाइल गैलरी में जोड़ता है।
+
+### 5. Send Profile Likes
+* **URL:** `/like?uid=YOUR_UID&region=IND`
+* **Method:** `GET`
+* **Description:** टारगेट UID पर डायरेक्ट लाइक्स भेजता है।
 
 ---
-
-## 🚀 Deployment Guide
-1. **Repository Setup:**
-   - Initialize a new GitHub repository.
-   - Upload `app.py`, `requirements.txt`, and `vercel.json`.
-2. **Vercel Connection:**
-   - Link your GitHub repository to [Vercel](https://vercel.com).
-   - Configure the root directory settings.
-   - Deploy!
-
----
-
-## 🔗 API Endpoints
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/add` | `GET` | Add items to profile |
-| `/health` | `GET` | Service status check |
-| `/regions` | `GET` | List supported regions |
-
----
-*Developed for optimal performance on mobile devices.*
+*Developed for high-speed automation and profile management.*
