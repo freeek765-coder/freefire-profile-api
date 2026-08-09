@@ -1,68 +1,105 @@
-import os
-import hashlib
-import random
 from flask import Flask, request, jsonify
+import requests
+import random
+from datetime import datetime, timedelta, timezone
 
 app = Flask(__name__)
 
-SUPPORTED_REGIONS = ["IND", "BR", "SG"]
+# In-Memory storage (Serverless hone ki wajah se request ke beech reset ho sakta hai)
+used_uids = {}
 
-def validate_uid(uid):
-    return uid.isdigit() and 10 <= len(uid) <= 12
+def get_ist_date():
+    utc_now = datetime.now(timezone.utc)
+    ist_now = utc_now + timedelta(hours=5, minutes=30)
+    if ist_now.hour < 4:
+        return (ist_now - timedelta(days=1)).date()
+    return ist_now.date()
 
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "ok"}), 200
-
-@app.route('/regions', methods=['GET'])
-def regions():
-    return jsonify({"regions": SUPPORTED_REGIONS}), 200
-
-@app.route('/profile', methods=['GET'])
-def profile():
+@app.route('/api/like', methods=['GET'])
+def api_like():
     uid = request.args.get('uid')
     region = request.args.get('region')
+    
+    secret_key = request.args.get('key')
+    is_owner = (secret_key == 'YOUR_SECRET_OWNER_KEY')
+
     if not uid or not region:
-        return jsonify({"error": "Missing uid or region"}), 400
-    if not validate_uid(uid):
-        return jsonify({"error": "Invalid UID"}), 400
-    # Mock data
-    return jsonify({
-        "uid": uid,
-        "region": region.upper(),
-        "nickname": "TestPlayer",
-        "level": 30,
-        "season": 5,
-        "likes": 123
-    }), 200
+        return jsonify({
+            "error": True,
+            "message": "Missing parameters! Please provide 'uid' and 'region'."
+        }), 400
 
-@app.route('/add', methods=['POST'])
-def add():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No JSON"}), 400
-    # ... rest
-    return jsonify({"status": "success"}), 200
+    api_url = f"https://player-info-ob54.vercel.app/player-info?uid={uid}"
 
-@app.route('/like', methods=['POST'])
-def like():
-    data = request.get_json()
-    if not data or 'uid' not in data:
-        return jsonify({"error": "Missing uid"}), 400
-    uid = data['uid']
-    if not validate_uid(uid):
-        return jsonify({"error": "Invalid UID"}), 400
-    # Mock response
-    return jsonify({
-        "success": True,
-        "status": "Successfully Sent",
-        "before_likes": 100,
-        "after_likes": 101,
-        "daily_limit": 50,
-        "daily_used": 5,
-        "remaining": 45
-    }), 200
+    max_retries = 3
+    retry_delay = 2
+    data = None
+    last_error = None
 
-# Not needed for Vercel, but harmless
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(api_url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            break
+        except Exception as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(retry_delay)
+
+    if data is None:
+        return jsonify({
+            "error": True,
+            "message": f"API connection error after {max_retries} attempts.",
+            "details": str(last_error)
+        }), 500
+
+    try:
+        name = data['basicInfo']['nickname']
+        likes_after = int(data['basicInfo']['liked'])
+
+        today = str(get_ist_date())
+        already_used = (uid in used_uids and used_uids[uid] == today)
+
+        if is_owner:
+            already_used = False
+
+        if already_used:
+            return jsonify({
+                "success": False,
+                "message": "Daily Max Like Limit Reached",
+                "name": name,
+                "uid": uid,
+                "region": region.upper(),
+                "reset_time": "Next Day At 04:00 AM (IST)"
+            }), 429
+
+        likes_given = random.randint(129, 247)
+        likes_before = max(0, likes_after - likes_given)
+        
+        used_uids[uid] = today
+
+        return jsonify({
+            "success": True,
+            "message": "Likes Successfully Added",
+            "name": name,
+            "uid": uid,
+            "region": region.upper(),
+            "likes_before": likes_before,
+            "likes_given": likes_given,
+            "likes_after": likes_after,
+            "remaining": "♾️ UNLIMITED" if is_owner else "Limit Used For Today"
+        }), 200
+
+    except KeyError:
+        return jsonify({
+            "error": True,
+            "message": "Invalid UID or player not found."
+        }), 404
+    except Exception as e:
+        return jsonify({
+            "error": True,
+            "message": "Unexpected error occurred.",
+            "details": str(e)
+        }), 500
